@@ -80,6 +80,6 @@ The original Mac browser service is still available from source with Node.js 22+
 
 ## Pondd’s collection
 
-The app footer includes reciprocal links to [Pondd’s portfolio](https://pond1982.github.io/Pondd-Page/), [Bangkok Sky Zero](https://pond1982.github.io/bangkok-sky-zero/) and the rest of the collection, plus the original dancing Pondd Easter egg. Its model, textures and Three.js runtime are bundled locally. The collection is included in the v1.2.1 installers.
+The app footer includes reciprocal links to [Pondd’s portfolio](https://pond1982.github.io/Pondd-Page/), [Bangkok Sky Zero](https://pond1982.github.io/bangkok-sky-zero/) and the rest of the collection, plus the original dancing Pondd Easter egg. Its model, textures and Three.js runtime are bundled locally. The desktop installers include the collection links and artwork.
 
 [Mascot artwork, app icons and screenshots](assets/README.md) · [MIT License](LICENSE)

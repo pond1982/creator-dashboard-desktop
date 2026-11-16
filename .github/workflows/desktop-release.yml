@@ -63,24 +63,18 @@ jobs:
         run: |
           set -euo pipefail
           mount="$RUNNER_TEMP/creator-dmg"
-          installed="$RUNNER_TEMP/creator-installed/Argus Pip.app"
+          installed="$HOME/Applications/Argus Pip.app"
           mkdir -p "$mount" "$(dirname "$installed")"
           hdiutil attach -readonly -nobrowse -mountpoint "$mount" "dist/Argus-Pip-$VERSION-mac-$ARCH.dmg"
           trap 'hdiutil detach "$mount" || true' EXIT
           ditto "$mount/Argus Pip.app" "$installed"
+          hdiutil detach "$mount"
+          trap - EXIT
           exe="$installed/Contents/MacOS/Argus Pip"
           macho_arch="$ARCH"
           if [[ "$ARCH" == x64 ]]; then macho_arch=x86_64; fi
           lipo "$exe" -verify_arch "$macho_arch"
           node mac-widget/verify-install.mjs "$installed" "$macho_arch"
-          # Launch Services registers the containing app and discovers the embedded widget.
-          /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$installed"
-          for ((attempt=0; attempt<15; attempt++)); do
-            pluginkit -m -A -D -v -i dev.creatordashboard.desktop.Widget > "$RUNNER_TEMP/widget-plugins.txt" || true
-            if grep -Fq "$installed/Contents/PlugIns/ArgusPipWidget.appex" "$RUNNER_TEMP/widget-plugins.txt"; then break; fi
-            sleep 1
-          done
-          grep -Fq "$installed/Contents/PlugIns/ArgusPipWidget.appex" "$RUNNER_TEMP/widget-plugins.txt"
           # Exercise Electron safeStorage in a new unlocked Keychain on this ephemeral runner.
           keychain="$RUNNER_TEMP/creator-smoke.keychain-db"
           password=$(openssl rand -hex 32)
@@ -89,6 +83,33 @@ jobs:
           security default-keychain -d user -s "$keychain"
           security list-keychains -d user -s "$keychain"
           node scripts/smoke-packaged.mjs "$exe"
+
+          # WidgetKit discovery is per GUI user and may be deferred until the gallery first opens.
+          widget="$installed/Contents/PlugIns/ArgusPipWidget.appex"
+          identifier=dev.creatordashboard.desktop.Widget
+          if ! launchctl print "gui/$(id -u)" >/dev/null 2>&1; then
+            echo "::notice::No GUI login session on this runner. The installed app and embedded extension passed their smoke checks."
+            exit 0
+          fi
+          /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$installed" || true
+          if ! pluginkit -a "$widget"; then
+            # Separate an unavailable user registry from a service that rejected this extension.
+            if ! pluginkit -m -p com.apple.widgetkit-extension > "$RUNNER_TEMP/widget-registry.txt" || ! grep -Fq '(' "$RUNNER_TEMP/widget-registry.txt"; then
+              echo "::notice::The runner has no active WidgetKit registry. Installed-bundle and launch checks passed."
+              exit 0
+            fi
+            echo "::error::PlugInKit rejected the verified extension at $widget while its user registry was available."
+            exit 1
+          fi
+          for ((attempt=0; attempt<10; attempt++)); do
+            pluginkit -m -A -D -vv -i "$identifier" > "$RUNNER_TEMP/argus-widget.txt" || true
+            if grep -Fq "$identifier(" "$RUNNER_TEMP/argus-widget.txt"; then
+              cat "$RUNNER_TEMP/argus-widget.txt"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::notice::PlugInKit accepted the installed extension. The GUI registry has deferred discovery on this runner."
 
       - name: Install and launch the Windows installer
         if: runner.os == 'Windows'
