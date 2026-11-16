@@ -1,0 +1,14 @@
+.DS_Store
+.build/
+node_modules/
+.env*
+*.p8
+*.pem
+*.p12
+client_secret*.json
+credentials.json
+*.pdf
+dist/
+release/
+*.dmg
+*.exe

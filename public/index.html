@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="referrer" content="no-referrer">
+  <title>YouTube · Creator Dashboard</title>
+  <script src="/theme-init.js"></script>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/settings.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="masthead">
+    <div class="bar">
+      <a href="#youtube" class="brand" aria-label="Creator Dashboard home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>Creator<span class="brand-light"> Dashboard</span></span>
+      </a>
+      <nav aria-label="Main navigation">
+        <span class="local-label"><i></i>On this device</span>
+        <a href="#connections" id="nav-connections" hidden>Connections</a>
+        <a href="#settings" id="nav-settings" hidden>Settings</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" tabindex="-1">
+    <div id="service-error" class="notice error" role="alert" hidden></div>
+    <nav id="source-tabs" class="source-tabs" aria-label="Data sources" hidden>
+      <a id="source-youtube" href="#youtube"><span class="provider-icon youtube-icon" aria-hidden="true"></span><span>YouTube<small>Channel analytics</small></span></a>
+      <a id="source-apple" href="#apple"><span class="provider-icon apple-icon" aria-hidden="true"><i></i><i></i><i></i></span><span>App Store Connect<small>Sales and trends</small></span></a>
+    </nav>
+    <section id="preferences" aria-labelledby="preferences-title" hidden>
+      <header class="preferences-head"><h1 id="preferences-title">Set up your dashboard</h1><p id="preferences-lead">Choose what to track on this device.</p></header>
+      <form id="preferences-form">
+        <fieldset class="choice-group"><legend>Sources</legend>
+          <div class="choice-grid">
+            <label class="choice"><input type="radio" name="sources" value="youtube"><span class="provider-icon youtube-icon" aria-hidden="true"></span><strong>YouTube</strong><small>Channel and video analytics</small></label>
+            <label class="choice"><input type="radio" name="sources" value="apple"><span class="provider-icon apple-icon" aria-hidden="true"><i></i><i></i><i></i></span><strong>App Store Connect</strong><small>App downloads and sales</small></label>
+            <label class="choice"><input type="radio" name="sources" value="both"><span class="dual-icon" aria-hidden="true"><i></i><i></i></span><strong>Both sources</strong><small>Channels and app sales</small></label>
+          </div>
+        </fieldset>
+        <fieldset class="choice-group"><legend>Appearance</legend>
+          <div class="choice-grid themes">
+            <label class="choice"><input type="radio" name="theme" value="midnight"><span class="swatches midnight" aria-hidden="true"><i></i><i></i><i></i></span><strong>Midnight</strong></label>
+            <label class="choice"><input type="radio" name="theme" value="aurora"><span class="swatches aurora" aria-hidden="true"><i></i><i></i><i></i></span><strong>Aurora</strong></label>
+            <label class="choice"><input type="radio" name="theme" value="daylight"><span class="swatches daylight" aria-hidden="true"><i></i><i></i><i></i></span><strong>Daylight</strong></label>
+          </div>
+        </fieldset>
+        <fieldset id="visibility-options" class="choice-group" hidden><legend>Visible channels</legend>
+          <label class="toggle-choice"><input type="checkbox" id="show-all">Show all connected channels</label>
+          <div id="visible-list"></div>
+        </fieldset>
+        <div class="save-row"><button class="button primary" type="submit" id="save-preferences">Continue to connections</button><span class="form-message" id="settings-feedback" role="status"></span></div>
+      </form>
+    </section>
+    <section id="overview" aria-label="Selected source" hidden><div id="workspace"></div></section>
+    <section id="connections" aria-labelledby="connections-title" hidden>
+      <div class="page-title"><h1 id="connections-title">Connections</h1></div>
+      <p class="intro">Connect each source once. Your operating system protects the keys used for scheduled updates. <a href="https://github.com/pond1982/creator-dashboard-desktop/blob/main/docs/credentials.md" target="_blank" rel="noopener noreferrer">Detailed credential guide ↗</a></p>
+      <div class="connection-tabs" aria-label="Choose a source">
+        <a href="#connections/youtube" id="tab-youtube">YouTube</a><a href="#connections/apple" id="tab-apple">App Store Connect</a>
+      </div>
+      <section id="setup-youtube" aria-labelledby="yt-setup-title">
+        <div class="setup-layout">
+          <div class="guide">
+            <h2 id="yt-setup-title">Connect your channels</h2>
+            <ol>
+              <li><strong>Enable the YouTube Data API.</strong> In Google Cloud, select or create a project. Open YouTube Data API v3 and choose <b>Enable</b>. <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener noreferrer">Open API Library ↗</a></li>
+              <li><strong>Create and restrict an API key.</strong> In Credentials, choose <b>Create credentials → API key</b>. Edit the key. Under API restrictions, select <b>Restrict key → YouTube Data API v3</b> and save. The desktop app sends API requests directly, so leave website restrictions off. <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">Open Credentials ↗</a></li>
+              <li><strong>Choose your channels.</strong> Open each channel’s public page and copy its @handle or channel URL. A channel ID beginning with UC also works.</li>
+            </ol>
+          </div>
+          <form id="youtube-form" autocomplete="off" class="setup-form">
+            <h3>YouTube connection</h3><p class="form-status" id="youtube-configured">Checking connection…</p>
+            <label for="api-key">YouTube API key</label><input type="password" id="api-key" autocomplete="new-password" required spellcheck="false">
+            <fieldset><legend>Channels</legend>
+              <div id="channel-inputs"></div>
+              <button type="button" class="button add-channel" id="add-channel">Add channel</button>
+            </fieldset>
+            <button type="submit" class="button primary">Connect channels</button>
+            <p class="form-message" id="youtube-feedback" role="status"></p>
+          </form>
+        </div>
+        <div class="setup-layout oauth-layout" id="studio-setup">
+          <div class="guide">
+            <h2>Studio analytics</h2>
+            <p>Connect Google to read watch time, subscribers gained and lost, and traffic sources for each channel.</p>
+            <ol>
+              <li><strong>Enable both YouTube APIs.</strong> In the same Cloud project, enable YouTube Data API v3 and YouTube Analytics API. <a href="https://console.cloud.google.com/apis/library/youtubeanalytics.googleapis.com" target="_blank" rel="noopener noreferrer">Open YouTube Analytics API ↗</a></li>
+              <li><strong>Configure Google Auth Platform.</strong> In Branding, enter an app name and your support email. In Audience, choose External for a personal project. If testing, add the Google accounts that manage your channels as test users. External apps in testing typically require renewed consent after seven days. <a href="https://console.cloud.google.com/auth/overview" target="_blank" rel="noopener noreferrer">Open Google Auth Platform ↗</a></li>
+              <li><strong>Create a desktop client.</strong> Open <b>Clients → Create client → Desktop app</b>. Download the client JSON and select it here. Then open each channel and choose <b>Connect Studio analytics</b> to grant read-only access for that channel. <a href="https://console.cloud.google.com/auth/clients" target="_blank" rel="noopener noreferrer">Open OAuth clients ↗</a></li>
+            </ol>
+          </div>
+          <form id="client-form" class="setup-form" autocomplete="off">
+            <h3>Google OAuth client</h3><p id="client-status" class="form-status">Checking connection…</p>
+            <label for="client-file">Desktop OAuth client JSON</label><input id="client-file" type="file" accept=".json,application/json" required>
+            <button class="button primary" type="submit">Save Google client</button>
+            <p id="client-feedback" class="form-message" role="status"></p>
+          </form>
+        </div>
+      </section>
+      <section id="setup-apple" aria-labelledby="apple-setup-title" hidden>
+        <div class="setup-layout">
+          <div class="guide">
+            <h2 id="apple-setup-title">Connect your app sales</h2>
+            <ol>
+              <li><strong>Open team keys.</strong> In App Store Connect, open <b>Users and Access → Integrations → App Store Connect API → Team Keys</b>. If access hasn’t been enabled, the Account Holder can request it there. <a href="https://appstoreconnect.apple.com/access/integrations/api" target="_blank" rel="noopener noreferrer">Open App Store Connect ↗</a></li>
+              <li><strong>Generate a reporting key.</strong> As Account Holder or Admin, create a team key with the <b>Sales and Reports</b> role. Copy the Key ID and Issuer ID from Integrations. Download the private .p8 file and keep it somewhere safe. Apple allows one download.</li>
+              <li><strong>Find your vendor number.</strong> In <b>Reports</b> (Payments and Financial Reports), look beneath your legal entity name at the top left. Enter the vendor number for your apps. <a href="https://developer.apple.com/help/app-store-connect/getting-paid/view-payments-and-proceeds/" target="_blank" rel="noopener noreferrer">Apple’s instructions ↗</a></li>
+            </ol>
+          </div>
+          <form id="apple-form" autocomplete="off" class="setup-form">
+            <h3>Apple reporting connection</h3><p class="form-status" id="apple-configured">Checking connection…</p>
+            <label for="key-id">Key ID</label><input type="text" id="key-id" required spellcheck="false">
+            <label for="issuer-id">Issuer ID</label><input type="text" id="issuer-id" required spellcheck="false">
+            <label for="vendor-number">Vendor number</label><input type="text" id="vendor-number" required spellcheck="false">
+            <label for="private-key">Private key file</label><input type="file" id="private-key" accept=".p8" required>
+            <button type="submit" class="button primary">Connect app sales</button>
+            <p class="form-message" id="apple-feedback" role="status"></p>
+          </form>
+        </div>
+      </section>
+    </section>
+  </main>
+  <div id="announcer" class="sr-only" role="status"></div>
+</body>
+</html>

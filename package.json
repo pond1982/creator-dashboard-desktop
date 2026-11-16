@@ -1,0 +1,26 @@
+{
+  "name": "creator-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A local desktop dashboard for YouTube channels and App Store Connect sales on Mac and Windows.",
+  "license": "MIT",
+  "repository": "github:pond1982/creator-dashboard-desktop",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node manage.mjs start",
+    "stop": "node manage.mjs stop",
+    "test": "node --test",
+    "desktop": "electron .",
+    "dist:mac": "electron-builder --mac dmg --publish never",
+    "dist:win": "electron-builder --win nsis --publish never"
+  },
+  "author": "pond1982",
+  "main": "desktop/main.mjs",
+  "devDependencies": {
+    "electron": "45.3.2",
+    "electron-builder": "26.18.0"
+  }
+}

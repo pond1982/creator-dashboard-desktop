@@ -1,0 +1,236 @@
+@page {
+  size: A4;
+  margin: 16mm 16mm 18mm;
+  @bottom-left {
+    content: "CREATOR DASHBOARD";
+    font: 8pt Arial;
+    color: #52646a;
+  }
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font: 8pt Arial;
+    color: #52646a;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: #142b35;
+  font: 10pt/1.45 "Helvetica Neue",Arial,Thonburi,sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+header {
+  border-top: 4px solid #116e76;
+  padding-top: 10px;
+}
+
+.brand {
+  float: right;
+  font-size: 9pt;
+  color: #516a70;
+}
+
+.type {
+  color: #126773;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-size: 8pt;
+}
+
+h1 {
+  font-size: 27pt;
+  letter-spacing: -.035em;
+  line-height: 1.17;
+  margin: 12px 0 4px;
+  overflow-wrap: anywhere;
+}
+
+h2 {
+  font-size: 14pt;
+  letter-spacing: -.02em;
+  margin: 16px 0 3px;
+  break-after: avoid;
+}
+
+.meta,.hint,small,.note {
+  color: #465d68;
+}
+
+.meta,.hint {
+  margin: 4px 0;
+}
+
+.metrics {
+  display: flex;
+  border-block: 1px solid #a8c9c9;
+  margin: 16px 0 10px;
+  padding: 12px 0;
+  gap: 12px;
+  break-inside: avoid;
+}
+
+.metrics div {
+  flex: 1;
+}
+
+.metrics span {
+  display: block;
+  color: #47616a;
+  font-size: 8pt;
+}
+
+.metrics b {
+  font-size: 15pt;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+}
+
+.description {
+  font-size: 9pt;
+  white-space: pre-line;
+  margin: 4px 0;
+  overflow-wrap: anywhere;
+}
+
+.notice {
+  background: #fff4d9;
+  color: #634519;
+  padding: 9px 12px;
+  font-size: 9pt;
+}
+
+.top {
+  break-inside: avoid;
+}
+
+.track {
+  margin: 5px 0;
+}
+
+.track div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 9pt;
+}
+
+.track span {
+  overflow-wrap: anywhere;
+}
+
+.bar {
+  background: #428b91;
+  height: 3px;
+  margin-top: 2px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8.5pt;
+  font-variant-numeric: tabular-nums;
+}
+
+thead {
+  display: table-header-group;
+}
+
+tr {
+  break-inside: avoid;
+}
+
+td,th {
+  padding: 5px;
+  border-bottom: 1px solid #d4dfe1;
+  text-align: right;
+  vertical-align: top;
+}
+
+th {
+  background: #e7f0f0;
+  color: #153f47;
+  font-size: 8pt;
+}
+
+td: not(:first-child) {
+  white-space: nowrap;
+}
+
+td: first-child,th:first-child {
+  text-align: left;
+}
+
+td: first-child {
+  overflow-wrap: anywhere;
+}
+
+a {
+  color: #173e49;
+  text-decoration: none;
+}
+
+small {
+  display: block;
+  font-size: 7.5pt;
+}
+
+.hint {
+  font-size: 8.5pt;
+  margin-bottom: 7px;
+}
+
+.note {
+  font-size: 8pt;
+  border-top: 1px solid #afc3c5;
+  padding-top: 6px;
+  margin-top: 15px;
+}
+
+h3 {
+  font-size: 10pt;
+  margin: 9px 0 3px;
+  break-after: avoid;
+}
+
+.breakdowns {
+  display: flex;
+  gap: 15px;
+  align-items: start;
+}
+
+.breakdowns>div {
+  flex: 1;
+  min-width: 0;
+}
+
+.bars {
+  height: 50px;
+  border-bottom: 1px solid #b5cdcd;
+  display: flex;
+  align-items: end;
+  gap: 2px;
+}
+
+.bars i {
+  display: block;
+  flex: 1;
+  background: #43858d;
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8pt;
+  color: #485f69;
+}
+
+.trend {
+  break-inside: avoid;
+}

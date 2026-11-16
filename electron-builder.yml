@@ -1,0 +1,35 @@
+appId: dev.creatordashboard.desktop
+productName: Creator Dashboard
+directories:
+  output: dist
+  buildResources: build
+asar: true
+files:
+  - desktop/**/*
+  - analytics.mjs
+  - apple.mjs
+  - dashboard.mjs
+  - keychain.mjs
+  - paths.mjs
+  - reports.mjs
+  - server.mjs
+  - settings.mjs
+  - youtube.mjs
+  - report.css
+  - public/**/*
+  - LICENSE
+mac:
+  target: dmg
+  category: public.app-category.business
+  # Ad-hoc signatures allow native launch on Apple Silicon; no Developer ID is bundled.
+  identity: "-"
+  notarize: false
+  artifactName: 'Creator-Dashboard-${version}-mac-${arch}.${ext}'
+win:
+  target: nsis
+  artifactName: 'Creator-Dashboard-${version}-win-${arch}.${ext}'
+nsis:
+  oneClick: true
+  perMachine: false
+  deleteAppDataOnUninstall: false
+publish: null

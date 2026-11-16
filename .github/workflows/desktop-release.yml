@@ -1,0 +1,157 @@
+name: Desktop installers
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-installers-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: ${{ matrix.platform }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {platform: mac, arch: arm64, runner: macos-15, ext: dmg}
+          - {platform: mac, arch: x64, runner: macos-15-intel, ext: dmg}
+          - {platform: win, arch: x64, runner: windows-2025, ext: exe}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Check target architecture and release version
+        id: version
+        shell: bash
+        env:
+          EXPECTED_ARCH: ${{ matrix.arch }}
+        run: |
+          set -euo pipefail
+          node -e 'if (process.arch !== process.env.EXPECTED_ARCH) throw Error("Expected native " + process.env.EXPECTED_ARCH + " runner")'
+          version=$(node -p 'require("./package.json").version')
+          if [[ "$GITHUB_REF_TYPE" == tag && "$GITHUB_REF_NAME" != "v$version" ]]; then
+            echo "::error::Tag must match the version in package.json."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - run: npm ci
+      - run: npm test
+      - name: Build installer
+        run: npm run dist:${{ matrix.platform }} -- --${{ matrix.arch }}
+
+      - name: Install and launch the macOS disk image
+        if: runner.os == 'macOS'
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          ARCH: ${{ matrix.arch }}
+          CREATOR_DASHBOARD_SMOKE_NATIVE_VAULT: "1"
+        run: |
+          set -euo pipefail
+          mount="$RUNNER_TEMP/creator-dmg"
+          installed="$RUNNER_TEMP/creator-installed/Creator Dashboard.app"
+          mkdir -p "$mount" "$(dirname "$installed")"
+          hdiutil attach -readonly -nobrowse -mountpoint "$mount" "dist/Creator-Dashboard-$VERSION-mac-$ARCH.dmg"
+          trap 'hdiutil detach "$mount" || true' EXIT
+          ditto "$mount/Creator Dashboard.app" "$installed"
+          codesign --verify --deep --strict "$installed"
+          exe="$installed/Contents/MacOS/Creator Dashboard"
+          lipo -verify_arch "$ARCH" "$exe"
+          # Exercise Electron safeStorage in a new unlocked Keychain on this ephemeral runner.
+          keychain="$RUNNER_TEMP/creator-smoke.keychain-db"
+          password=$(openssl rand -hex 32)
+          security create-keychain -p "$password" "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          security default-keychain -d user -s "$keychain"
+          security list-keychains -d user -s "$keychain"
+          node scripts/smoke-packaged.mjs "$exe"
+
+      - name: Install and launch the Windows installer
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $package = (Resolve-Path "dist/Creator-Dashboard-$env:VERSION-win-x64.exe").Path
+          $installed = Join-Path $env:RUNNER_TEMP 'creator-installed'
+          $installer = Start-Process -FilePath $package -ArgumentList "/S /currentuser /D=$installed" -PassThru -Wait
+          if ($installer.ExitCode -ne 0) { throw "Installer returned $($installer.ExitCode)." }
+          node scripts/smoke-packaged.mjs (Join-Path $installed 'Creator Dashboard.exe')
+          exit $LASTEXITCODE
+
+      - name: Save tested installer
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: installer-${{ matrix.platform }}-${{ matrix.arch }}
+          path: dist/Creator-Dashboard-${{ steps.version.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}.${{ matrix.ext }}
+          if-no-files-found: error
+          compression-level: 0
+
+  release:
+    name: Publish verified installers
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          pattern: installer-*
+          path: installers
+          merge-multiple: true
+      - name: Compute SHA-256 checksums and publish
+        shell: bash
+        working-directory: installers
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          files=(
+            "Creator-Dashboard-$version-mac-arm64.dmg"
+            "Creator-Dashboard-$version-mac-x64.dmg"
+            "Creator-Dashboard-$version-win-x64.exe"
+          )
+          sha256sum "${files[@]}" > SHA256SUMS.txt
+          sha256sum --check SHA256SUMS.txt
+
+          notes="$RUNNER_TEMP/release-notes.md"
+          cat > "$notes" <<'NOTES'
+          **Mac** — Choose the arm64 disk image for an Apple M-series chip or x64 for an Intel chip. Open the DMG, drag Creator Dashboard to Applications, then launch it. Find your chip under Apple menu → About This Mac.
+
+          **Windows** — Download the x64 EXE, run it, then open Creator Dashboard from Start.
+
+          These builds have no verified publisher certificate. macOS may require **System Settings → Privacy & Security → Open Anyway** after the first launch attempt. Windows may show a Microsoft Defender SmartScreen prompt. Download the installer from this release and verify its SHA-256 checksum if needed.
+
+          The app includes its runtime and PDF exporter. On first launch, choose your sources, then use Connections to add your credentials.
+          NOTES
+
+          if draft=$(gh release view "$TAG" --json isDraft --jq '.isDraft' 2>/dev/null); then
+            if [[ "$draft" != true ]]; then
+              echo "::error::A published release already exists for $TAG. Use a new version for different binaries."
+              exit 1
+            fi
+          else
+            gh release create "$TAG" --verify-tag --draft --title "Creator Dashboard $TAG" --notes-file "$notes"
+          fi
+          gh release upload "$TAG" "${files[@]}" SHA256SUMS.txt --clobber
+          gh release edit "$TAG" --draft=false --notes-file "$notes"
