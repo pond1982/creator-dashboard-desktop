@@ -12,7 +12,7 @@ import { createAnalytics } from './analytics.mjs';
 import { reportDocument, renderPdf } from './reports.mjs';
 import { validateApplePeriod } from './apple.mjs';
 
-const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.png': 'image/png', '.woff2': 'font/woff2' };
+const types = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.png': 'image/png', '.jpg': 'image/jpeg', '.glb': 'model/gltf-binary', '.woff2': 'font/woff2' };
 const publicDir = path.join(root, 'public');
 
 async function readBody(req) {

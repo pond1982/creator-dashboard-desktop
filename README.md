@@ -63,3 +63,7 @@ Build a local installer with `npm run dist:mac` on macOS or `npm run dist:win` o
 The original Mac browser service is still available from source with Node.js 22+, Apple Command Line Tools and Google Chrome for PDF export. Double-click **Start Dashboard.command** or run `npm start` and open `http://127.0.0.1:47831/`. Run `npm stop` from the project folder to stop its login service.
 
 Released under the [MIT License](LICENSE).
+
+## Pondd’s collection
+
+The app footer includes reciprocal links to [Pondd’s portfolio](https://pond1982.github.io/Pondd-Page/), [Bangkok Sky Zero](https://pond1982.github.io/bangkok-sky-zero/) and the rest of the collection, plus the original dancing Pondd Easter egg. Its model, textures and Three.js runtime are bundled locally; no external scripts or security-policy changes are required. This source addition is not included in previously published installers.

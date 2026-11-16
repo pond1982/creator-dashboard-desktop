@@ -35,10 +35,17 @@ test('desktop sessions protect loopback data and persist onboarding and channel 
   origin = 'http://127.0.0.1:' + server.address().port;
   const headers = { 'X-Creator-Session': sessionToken, 'X-Dashboard-Request':'1', 'Content-Type':'application/json' };
   const post = (route, body) => fetch(origin + route, { method:'POST', headers, body:JSON.stringify(body) });
-  for (const route of ['/', '/app.js', '/api/state', '/oauth/google/callback']) {
+  for (const route of ['/', '/app.js', '/pondd.glb', '/pondd-texture-0.jpg', '/api/state', '/oauth/google/callback']) {
     assert.equal((await fetch(origin + route)).status, 403);
   }
   assert.equal((await fetch(origin + '/api/state', { headers:{ 'X-Creator-Session':'incorrect' } })).status, 403);
+  for (const [asset, type] of [['/pondd.glb','model/gltf-binary'], ['/pondd-texture-0.jpg','image/jpeg'], ['/pondd-three.js','text/javascript']]) {
+    const response = await fetch(origin + asset, { headers });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('content-type'), type);
+    assert(response.headers.get('content-security-policy').includes("script-src 'self'"));
+    assert(response.headers.get('content-security-policy').includes("connect-src 'self'"));
+  }
   const wrongHost = await new Promise((resolve, reject) => {
     get(origin + '/api/state', { headers: { ...headers, host: 'example.com' } }, res => {
       res.resume();
