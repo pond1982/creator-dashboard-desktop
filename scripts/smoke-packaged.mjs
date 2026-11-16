@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 const [executable] = process.argv.slice(2);
-if (!executable) throw new Error('Pass the path to the installed Creator Dashboard executable.');
+if (!executable) throw new Error('Pass the path to the installed Argus Pip executable.');
 
 const dir = await mkdtemp(path.join(os.tmpdir(), 'creator-installer-smoke-'));
 const marker = path.join(dir, 'result.txt');

@@ -30,7 +30,7 @@ export async function openSettings(dir, currentState) {
   try {
     settings = validate(JSON.parse(await readFile(file, 'utf8')));
   } catch (error) {
-    if (error.code !== 'ENOENT') throw new Error('Cannot read settings.json in Creator Dashboard’s data folder.');
+    if (error.code !== 'ENOENT') throw new Error('Cannot read settings.json in Argus Pip’s data folder.');
     settings = {
       onboarded: sources.some(source => currentState[source]?.configured),
       sources: [...sources],

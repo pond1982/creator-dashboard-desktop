@@ -112,42 +112,12 @@ h1,h2,h3,p,dl,dd,figure {
   text-decoration:none;
 }
 
-.brand-light {
-  color:#afbdc9;
-  font-weight:450;
-}
-
-.brand-mark {
-  width:31px;
-  height:31px;
-  border:1px solid #6cd0c558;
-  border-radius:8px;
-  background:linear-gradient(135deg,#183a3b,#12242a);
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
-  gap:2.5px;
-  padding-bottom:7px;
-  transform:rotate(-4deg);
-}
-
-.brand-mark i {
+.brand-mascot {
   display:block;
-  width:3px;
-  border-radius:2px;
-  background:var(--cyan);
-}
-
-.brand-mark i:nth-child(1) {
-  height:6px;
-}
-
-.brand-mark i:nth-child(2) {
-  height:11px;
-}
-
-.brand-mark i:nth-child(3) {
-  height:16px;
+  width:38px;
+  height:38px;
+  flex-shrink:0;
+  object-fit:contain;
 }
 
 .bar nav,.local-label {

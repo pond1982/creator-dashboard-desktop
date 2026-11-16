@@ -58,28 +58,48 @@ async function legacyRunning() {
 
 // Import into a fresh sibling, then publish the complete import with one rename.
 // Read legacy Keychain items only after consent; never set or delete them.
-export async function offerMacImport({ dir, legacyDir, legacyGet, encryption, dialog }) {
-  if (await exists(dir)) return true;
+export async function offerMacImport({ dir, legacyDir, legacyGet, encryption, dialog, isRunning = legacyRunning }) {
+  // A previous empty first run creates the directory before any source is
+  // connected. It can still accept an import without replacing credentials.
+  const destinationExists = await exists(dir);
+  const skip = path.join(dir, 'declined-legacy-import');
+  if (destinationExists) {
+    for (const name of ['declined-legacy-import', 'youtube.json', 'apple.json', 'analytics/client.json']) {
+      if (await exists(path.join(dir, name))) return true;
+    }
+    for (const name of ['analytics', 'credentials']) {
+      const folder = path.join(dir, name);
+      if (await exists(folder) && (await readdir(folder)).length) return true;
+    }
+  }
   const candidates = [];
   for (const file of ['youtube.json', 'apple.json', 'settings.json']) {
     if (await exists(path.join(legacyDir, file))) candidates.push(file);
   }
   if (!candidates.some(file => file !== 'settings.json')) return true;
-  if (await legacyRunning()) {
+  async function startFresh() {
+    await mkdir(dir, { recursive: true, mode: 0o700 });
+    await writeFile(skip, '1', { mode: 0o600 });
+    return true;
+  }
+  while (await isRunning()) {
     const { response } = await dialog.showMessageBox({
-      type: 'info', title: 'Previous dashboard is running', message: 'Your previous Mac dashboard is still running.',
-      detail: 'To import its connections, quit this app, double-click Stop Dashboard.command in the project folder (or run npm stop there), then reopen Creator Dashboard. Starting fresh gives this desktop app a separate setup.',
-      buttons: ['Quit to import later', 'Start fresh'], defaultId: 0, cancelId: 0,
+      type: 'info', title: 'Import into Argus Pip', message: 'Your previous Mac dashboard is running.',
+      detail: 'To import its connections and reports, double-click Stop Dashboard.command in the previous project folder (or run npm stop there), then choose Check again. Choose Start fresh for a separate Argus Pip setup.',
+      buttons: ['Check again', 'Start fresh', 'Quit'], defaultId: 0, cancelId: 2,
     });
-    return response === 1;
+    if (response === 1) return startFresh();
+    if (response !== 0) return false;
   }
   const { response } = await dialog.showMessageBox({
-    type: 'question', title: 'Import previous Mac setup', message: 'Import the connections and reports from your previous Mac dashboard?',
+    type: 'question', title: 'Import previous Mac setup', message: 'Import your previous Mac dashboard into Argus Pip?',
     detail: 'This makes a separate copy of your saved reports, settings and credentials. Keep the previous background service stopped while this app refreshes the same Google grants.',
     buttons: ['Import setup', 'Start fresh', 'Quit'], defaultId: 0, cancelId: 2,
   });
-  if (response !== 0) return response === 1;
+  if (response === 1) return startFresh();
+  if (response !== 0) return false;
   const stage = await mkdtemp(path.join(path.dirname(dir), '.import-'));
+  let previous;
   try {
     const vault = await createVault(stage, encryption);
     const accounts = new Set();
@@ -107,10 +127,20 @@ export async function offerMacImport({ dir, legacyDir, legacyGet, encryption, di
       }
     }
     for (const account of accounts) await vault('set', account, await legacyGet(account));
-    if (await legacyRunning() || await exists(dir)) throw new Error('Setup changed during import.');
+    if (await isRunning() || await exists(dir) !== destinationExists) throw new Error('Setup changed during import.');
+    if (destinationExists) {
+      // Preserve a previously selected theme during import. Keep the full
+      // unconnected setup as a backup until the user chooses to remove it.
+      const settings = path.join(dir, 'settings.json');
+      if (await exists(settings)) await writeFile(path.join(stage, 'settings.json'), await readFile(settings), { mode: 0o600 });
+      const backup = path.join(path.dirname(dir), 'dashboard.before-import-' + randomUUID());
+      await rename(dir, backup);
+      previous = backup;
+    }
     await rename(stage, dir);
     return true;
   } catch {
+    if (previous && !await exists(dir)) await rename(previous, dir);
     throw new Error('The previous setup could not be imported. Unlock the login Keychain, check that the previous service is stopped and reopen this app to try again. Your original data is still available.');
   } finally { await rm(stage, { recursive: true, force: true }); }
 }

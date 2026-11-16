@@ -14,7 +14,10 @@ import { makeServer } from '../server.mjs';
 import { openSettings } from '../settings.mjs';
 import { createVault, offerMacImport } from './storage.mjs';
 
+const brand = 'Argus Pip';
 const smoke = process.argv.includes('--smoke-test');
+// Keep both the data and Chromium Local State (the Windows DPAPI key) at
+// their original paths when an existing desktop installation upgrades.
 const profile = smoke ? mkdtempSync(path.join(os.tmpdir(), 'creator-smoke-'))
   : path.join(app.getPath('appData'), 'Creator Dashboard Desktop');
 if (process.platform !== 'win32') process.umask(0o077);
@@ -84,27 +87,21 @@ function show() {
 }
 
 function trayIcon() {
-  // A small version of the three bars in the dashboard's brand mark.
-  const width = 32;
-  const bitmap = Buffer.alloc(width * width * 4);
-  for (let i = 0; i < 3; i++) {
-    for (let y = 17 - 5 * i; y < 27; y++) {
-      for (let x = 4 + 9 * i; x < 10 + 9 * i; x++) {
-        const mark = (y * width + x) * 4;
-        if (process.platform !== 'darwin') bitmap.set([0x8c, 0xe0, 0x48], mark);
-        bitmap[mark + 3] = 255;
-      }
-    }
+  const mac = process.platform === 'darwin';
+  const file = path.join(app.getAppPath(), 'public', mac ? 'argus-pip-tray.png' : 'argus-pip.png');
+  const image = nativeImage.createFromPath(file);
+  if (image.isEmpty()) throw new Error('The Argus Pip tray icon is unavailable.');
+  if (mac) {
+    image.setTemplateImage(true);
+    return image;
   }
-  const icon = nativeImage.createFromBitmap(bitmap, { width, height: width, scaleFactor: 2 });
-  if (process.platform === 'darwin') icon.setTemplateImage(true);
-  return icon;
+  return image.resize({ width: 32, height: 32, quality: 'best' });
 }
 
 function installMenus() {
   const loginArgs = process.platform === 'win32' ? { args: ['--background'] } : {};
   const operations = () => [
-    { label: 'Open Creator Dashboard', click: show },
+    { label: 'Open ' + brand, click: show },
     { label: 'Launch at login', type: 'checkbox', enabled: app.isPackaged,
       checked: app.isPackaged && app.getLoginItemSettings(loginArgs).openAtLogin,
       click: item => {
@@ -113,17 +110,17 @@ function installMenus() {
         rebuild();
       } },
     { type: 'separator' },
-    { label: 'Quit Creator Dashboard', accelerator: 'CmdOrCtrl+Q', click: () => app.quit() },
+    { label: 'Quit ' + brand, accelerator: 'CmdOrCtrl+Q', click: () => app.quit() },
   ];
   const rebuild = () => {
     tray.setContextMenu(Menu.buildFromTemplate(operations()));
     Menu.setApplicationMenu(Menu.buildFromTemplate([
-      { label: 'Creator Dashboard', submenu: operations() },
+      { label: brand, submenu: operations() },
       { role: 'editMenu' }, { role: 'windowMenu' },
     ]));
   };
   tray = new Tray(trayIcon());
-  tray.setToolTip('Creator Dashboard');
+  tray.setToolTip(brand);
   if (process.platform === 'win32') tray.on('click', show);
   rebuild();
 }
@@ -132,7 +129,7 @@ async function openDashboard() {
   const appSession = session.fromPartition('creator-ui');
   noPermissions(appSession);
   window = new BrowserWindow({ show: false, width: 1240, height: 850, minWidth: 650, minHeight: 500,
-    title: 'Creator Dashboard', webPreferences: { ...securePreferences, session: appSession } });
+    title: brand, webPreferences: { ...securePreferences, session: appSession } });
   const owner = window.webContents.id;
   const localPage = value => {
     const parsed = new URL(value);
@@ -171,6 +168,7 @@ async function openDashboard() {
 }
 
 async function smokeTest() {
+  trayIcon(); // Verify that the packaged tray artwork can be decoded.
   // Windows DPAPI is noninteractive. On a developer's Mac, use an ephemeral
   // cipher unless they explicitly select the native Keychain smoke check.
   let cipher = safeStorage;
@@ -221,11 +219,14 @@ async function smokeTest() {
   await renderPdf(html);
   const result = process.env.CREATOR_DASHBOARD_SMOKE_RESULT;
   if (result) await writeFile(result, 'ok\n', { flag: 'wx', mode: 0o600 });
-  console.log('Creator Dashboard packaged smoke test passed.');
+  console.log('Argus Pip packaged smoke test passed.');
 }
 
 async function start() {
-  if (!smoke && !['darwin', 'win32'].includes(process.platform)) throw new Error('Creator Dashboard supports macOS and Windows.');
+  // Electron 45 sets the macOS Keychain identity from package.json during its
+  // native initialization. Change the display name only after app.whenReady().
+  app.setName(brand);
+  if (!smoke && !['darwin', 'win32'].includes(process.platform)) throw new Error('Argus Pip supports macOS and Windows.');
   if (!smoke && process.platform === 'darwin') {
     const proceed = await offerMacImport({ dir, legacyDir, encryption: safeStorage, dialog, legacyGet: account => keychain('get', account) });
     if (!proceed) { app.quit(); return; }
@@ -274,8 +275,8 @@ else {
     if (smoke) { console.error('Desktop smoke test failed:', error.message); app.exit(1); }
     else {
       const message = error.message.startsWith('The previous setup could not be imported') ? error.message :
-        'Creator Dashboard could not start. Check that your user data folder is writable and reopen the app.';
-      dialog.showErrorBox('Creator Dashboard', message);
+        'Argus Pip could not start. Check that your user data folder is writable and reopen the app.';
+      dialog.showErrorBox(brand, message);
       app.exit(1);
     }
   });

@@ -1,5 +1,5 @@
 appId: dev.creatordashboard.desktop
-productName: Creator Dashboard
+productName: Argus Pip
 directories:
   output: dist
   buildResources: build
@@ -24,10 +24,10 @@ mac:
   # Ad-hoc signatures allow native launch on Apple Silicon; no Developer ID is bundled.
   identity: "-"
   notarize: false
-  artifactName: 'Creator-Dashboard-${version}-mac-${arch}.${ext}'
+  artifactName: 'Argus-Pip-${version}-mac-${arch}.${ext}'
 win:
   target: nsis
-  artifactName: 'Creator-Dashboard-${version}-win-${arch}.${ext}'
+  artifactName: 'Argus-Pip-${version}-win-${arch}.${ext}'
 nsis:
   oneClick: true
   perMachine: false

@@ -48,7 +48,7 @@ test('desktop sessions protect loopback data and persist onboarding and channel 
   assert.equal(wrongHost, 403);
   assert.equal((await fetch(origin + '/api/settings', { method:'POST', headers:{ ...headers, origin:'https://example.com' }, body:'{}' })).status, 403);
   assert.equal((await fetch(origin + '/?code=demo&state=wrong')).status, 400);
-  assert.match(await (await fetch(origin + '/?code=demo&state=expected')).text(), /return to Creator Dashboard/);
+  assert.match(await (await fetch(origin + '/?code=demo&state=expected')).text(), /return to Argus Pip/);
   assert.equal((await post('/api/setup/youtube', { apiKey:'example-only', inputs:channels.slice(0,1) })).status, 200);
   assert.equal((await post('/api/setup/youtube', { apiKey:'', inputs:channels })).status, 200);
   const preferences = { onboarded:true, theme:'aurora', sources:['youtube'], visibleChannelIds:channels.slice(1,3) };

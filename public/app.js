@@ -122,7 +122,7 @@ function route() {
     id('connections').hidden = true;
     id('nav-settings').setAttribute('aria-current', 'page');
     id('nav-connections').removeAttribute('aria-current');
-    document.title = (saved.onboarded ? 'Settings' : 'Welcome') + ' · Creator Dashboard';
+    document.title = (saved.onboarded ? 'Settings' : 'Welcome') + ' · Argus Pip';
     return;
   }
   if (showingPreferences) userSettings.close();
@@ -263,7 +263,7 @@ async function loadPeriod(span) {
 
 function render() {
   if (showingPreferences) return;
-  if (setup) { document.title = 'Connections · Creator Dashboard'; return; }
+  if (setup) { document.title = 'Connections · Argus Pip'; return; }
   if (!state) return;
   const focus = document.activeElement?.dataset.focus;
   const box = id('workspace');
@@ -281,7 +281,7 @@ function render() {
   const error = actionErrors[source] || record.error;
   if (error) box.append(notice((record.data ? 'Last update failed. ' : '') + error, true));
   const title = source === 'youtube' ? 'YouTube' : 'App Store Connect';
-  document.title = title + ' · Creator Dashboard';
+  document.title = title + ' · Argus Pip';
   if (!record.configured) { box.append(disconnected(source)); return; }
   let reportOptions;
   if (source === 'youtube' && record.data?.length) {
@@ -297,7 +297,7 @@ function render() {
     if (location.hash.startsWith('#youtube/') && channelId !== selected.id) history.replaceState(null, '', '#youtube/' + encodeURIComponent(selected.id));
     channelId = selected.id;
     id('source-youtube').href = '#youtube/' + encodeURIComponent(channelId);
-    document.title = selected.title + ' · Creator Dashboard';
+    document.title = selected.title + ' · Argus Pip';
     reportOptions = { source, channelId, videoSort: preferences.videoOrder, updatedAt: record.updatedAt };
     box.append(channelTabs(channels, channelId));
     const sid = selected.id;
@@ -359,7 +359,7 @@ async function loadState() {
     updateForms();
   } catch {
     if (request !== readingState) return;
-    id('service-error').textContent = 'Can’t reach the local dashboard. Reopen Creator Dashboard and try again.';
+    id('service-error').textContent = 'Can’t reach the local dashboard. Reopen Argus Pip and try again.';
     id('service-error').hidden = false;
   }
 }

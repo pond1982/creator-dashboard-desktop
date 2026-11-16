@@ -74,12 +74,12 @@ async function stop() {
   // Remove only the generated per-user launch entry so macOS will not restart it at login.
   const { unlink } = await import('node:fs/promises');
   await unlink(plist).catch(error => { if (error.code !== 'ENOENT') throw error; });
-  console.log('Creator Dashboard is stopped. Start Dashboard.command will start it again.');
+  console.log('The legacy browser dashboard is stopped. Start Dashboard.command will start it again.');
 }
 
 try {
   process.umask(0o077);
-  if (process.platform !== 'darwin') throw new Error('Creator Dashboard requires macOS for Keychain and its background service.');
+  if (process.platform !== 'darwin') throw new Error('The legacy browser service requires macOS for its Keychain helper and background updates.');
   if (Number(process.versions.node.split('.')[0]) < 22) throw new Error('Install Node.js 22 or newer, then start the dashboard again.');
   if (process.argv[2] === 'start') await start();
   else if (process.argv[2] === 'stop') await stop();

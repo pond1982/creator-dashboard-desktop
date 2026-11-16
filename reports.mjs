@@ -24,7 +24,7 @@ function duration(seconds) {
 }
 
 function heading(type, title, metadata) {
-  return '<header><div class="brand">Creator Dashboard</div><div class="type">' + escape(type) + '</div><h1>' +
+  return '<header><div class="brand">Argus Pip</div><div class="type">' + escape(type) + '</div><h1>' +
     escape(title) + '</h1><p class="meta">' + metadata.filter(Boolean).map(escape).join(' · ') + '</p></header>';
 }
 

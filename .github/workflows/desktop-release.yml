@@ -1,4 +1,4 @@
-name: Desktop installers
+name: Argus Pip desktop installers
 
 on:
   push:
@@ -63,13 +63,13 @@ jobs:
         run: |
           set -euo pipefail
           mount="$RUNNER_TEMP/creator-dmg"
-          installed="$RUNNER_TEMP/creator-installed/Creator Dashboard.app"
+          installed="$RUNNER_TEMP/creator-installed/Argus Pip.app"
           mkdir -p "$mount" "$(dirname "$installed")"
-          hdiutil attach -readonly -nobrowse -mountpoint "$mount" "dist/Creator-Dashboard-$VERSION-mac-$ARCH.dmg"
+          hdiutil attach -readonly -nobrowse -mountpoint "$mount" "dist/Argus-Pip-$VERSION-mac-$ARCH.dmg"
           trap 'hdiutil detach "$mount" || true' EXIT
-          ditto "$mount/Creator Dashboard.app" "$installed"
+          ditto "$mount/Argus Pip.app" "$installed"
           codesign --verify --deep --strict "$installed"
-          exe="$installed/Contents/MacOS/Creator Dashboard"
+          exe="$installed/Contents/MacOS/Argus Pip"
           macho_arch="$ARCH"
           if [[ "$ARCH" == x64 ]]; then macho_arch=x86_64; fi
           lipo "$exe" -verify_arch "$macho_arch"
@@ -89,18 +89,18 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $package = (Resolve-Path "dist/Creator-Dashboard-$env:VERSION-win-x64.exe").Path
+          $package = (Resolve-Path "dist/Argus-Pip-$env:VERSION-win-x64.exe").Path
           $installed = Join-Path $env:RUNNER_TEMP 'creator-installed'
           $installer = Start-Process -FilePath $package -ArgumentList "/S /currentuser /D=$installed" -PassThru -Wait
           if ($installer.ExitCode -ne 0) { throw "Installer returned $($installer.ExitCode)." }
-          node scripts/smoke-packaged.mjs (Join-Path $installed 'Creator Dashboard.exe')
+          node scripts/smoke-packaged.mjs (Join-Path $installed 'Argus Pip.exe')
           exit $LASTEXITCODE
 
       - name: Save tested installer
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: installer-${{ matrix.platform }}-${{ matrix.arch }}
-          path: dist/Creator-Dashboard-${{ steps.version.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}.${{ matrix.ext }}
+          path: dist/Argus-Pip-${{ steps.version.outputs.version }}-${{ matrix.platform }}-${{ matrix.arch }}.${{ matrix.ext }}
           if-no-files-found: error
           compression-level: 0
 
@@ -129,18 +129,18 @@ jobs:
           set -euo pipefail
           version="${TAG#v}"
           files=(
-            "Creator-Dashboard-$version-mac-arm64.dmg"
-            "Creator-Dashboard-$version-mac-x64.dmg"
-            "Creator-Dashboard-$version-win-x64.exe"
+            "Argus-Pip-$version-mac-arm64.dmg"
+            "Argus-Pip-$version-mac-x64.dmg"
+            "Argus-Pip-$version-win-x64.exe"
           )
           sha256sum "${files[@]}" > SHA256SUMS.txt
           sha256sum --check SHA256SUMS.txt
 
           notes="$RUNNER_TEMP/release-notes.md"
           cat > "$notes" <<'NOTES'
-          **Mac** — Choose the arm64 disk image for an Apple M-series chip or x64 for an Intel chip. Open the DMG, drag Creator Dashboard to Applications, then launch it. Find your chip under Apple menu → About This Mac.
+          **Mac** — Choose the arm64 disk image for an Apple M-series chip or x64 for an Intel chip. Open the DMG, drag Argus Pip to Applications, then launch it. Find your chip under Apple menu → About This Mac.
 
-          **Windows** — Download the x64 EXE, run it, then open Creator Dashboard from Start.
+          **Windows** — Download the x64 EXE, run it, then open Argus Pip from Start.
 
           These builds have no verified publisher certificate. macOS may require **System Settings → Privacy & Security → Open Anyway** after the first launch attempt. Windows may show a Microsoft Defender SmartScreen prompt. Download the installer from this release and verify its SHA-256 checksum if needed.
 
@@ -153,7 +153,7 @@ jobs:
               exit 1
             fi
           else
-            gh release create "$TAG" --verify-tag --draft --title "Creator Dashboard $TAG" --notes-file "$notes"
+            gh release create "$TAG" --verify-tag --draft --title "Argus Pip $TAG" --notes-file "$notes"
           fi
           gh release upload "$TAG" "${files[@]}" SHA256SUMS.txt --clobber
           gh release edit "$TAG" --draft=false --notes-file "$notes"

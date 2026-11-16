@@ -38,7 +38,7 @@ export function settingsForm({ getState, save, finish }) {
     const welcome = !settings.onboarded;
     editing = true;
     feedback.replaceChildren();
-    get('preferences-title').textContent = welcome ? 'Set up your dashboard' : 'Dashboard settings';
+    get('preferences-title').textContent = welcome ? 'Set up Argus Pip' : 'Argus Pip settings';
     get('preferences-lead').textContent = welcome ? 'Choose what to track on this device.' : 'Choose your sources, appearance and visible channels.';
     saveButton.textContent = welcome ? 'Continue to connections' : 'Save settings';
     form.elements.sources.value = settings.sources.length === 2 ? 'both' : settings.sources[0];

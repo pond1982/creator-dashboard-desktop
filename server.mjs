@@ -59,7 +59,7 @@ export async function makeServer(dashboard, localPort = port, analytics = null, 
     const host = req.headers.host;
     const expectedOrigin = options.getOrigin?.();
     if (expectedOrigin ? host !== new URL(expectedOrigin).host : !hosts.has(host)) {
-      return json(403, { error: 'Open Creator Dashboard on this computer.' });
+      return json(403, { error: 'Open Argus Pip on this computer.' });
     }
     const route = req.url.split('?')[0];
     try {
@@ -69,7 +69,7 @@ export async function makeServer(dashboard, localPort = port, analytics = null, 
       if (token && !isConsent) {
         const received = Buffer.from(req.headers['x-creator-session'] || '');
         if (received.length !== token.length || !timingSafeEqual(received, token)) {
-          return json(403, { error: 'Open Creator Dashboard to access this page.' });
+          return json(403, { error: 'Open Argus Pip to access this page.' });
         }
       }
       if (req.method === 'GET' || req.method === 'HEAD') {
@@ -82,7 +82,7 @@ export async function makeServer(dashboard, localPort = port, analytics = null, 
           }
           if (token) {
             res.writeHead(failure ? 400 : 200, { 'Content-Type': 'text/plain; charset=utf-8' });
-            return res.end(failure ? 'Sign-in did not finish. ' + failure : 'Channel connected. You can close this tab and return to Creator Dashboard.');
+            return res.end(failure ? 'Sign-in did not finish. ' + failure : 'Channel connected. You can close this tab and return to Argus Pip.');
           }
           // Replace the callback URL so authorization codes never enter the app or outgoing links.
           const target = failure ? '/#analytics-error/' + encodeURIComponent(failure) : '/#youtube/' + encodeURIComponent(channel);
@@ -172,7 +172,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const settings = await openSettings(support, dashboard.state());
   const server = await makeServer(dashboard, port, analytics, settings);
   server.listen(port, '127.0.0.1', () => {
-    console.log('Creator Dashboard is available at ' + address);
+    console.log('Argus Pip is available at ' + address);
     const tick = async () => {
       await dashboard.tick(settings.get().sources).catch(() => console.error('Could not update the local cache.'));
       const ids = settings.get().sources.includes('youtube') ? (dashboard.state().youtube.data || []).map(channel => channel.id) : [];

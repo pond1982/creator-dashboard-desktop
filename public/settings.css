@@ -52,7 +52,6 @@
   color:var(--ink);
 }
 
-:root:is([data-theme="aurora"],[data-theme="daylight"]) .brand-light,
 :root:is([data-theme="aurora"],[data-theme="daylight"]) .studio-empty {
   color:var(--muted);
 }
@@ -70,11 +69,6 @@
   background:var(--raised);
   border-color:var(--line);
   color:var(--ink);
-}
-
-:root:is([data-theme="aurora"],[data-theme="daylight"]) .brand-mark {
-  background:var(--choice-active);
-  border-color:var(--choice-border);
 }
 
 :root:is([data-theme="aurora"],[data-theme="daylight"]) .stat-band {

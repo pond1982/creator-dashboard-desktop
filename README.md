@@ -1,16 +1,16 @@
-# Creator Dashboard
+# Argus Pip
 
 A desktop app for creators who check YouTube Studio and App Store Connect throughout the day. Open it to see how your latest video is doing, compare app sales with the previous period, or save a PDF report. Your connections and reports stay on your computer.
 
 ## Download and install
 
-**[Download Creator Dashboard for Mac or Windows](https://github.com/pond1982/creator-dashboard-desktop/releases/latest)**. Open **Assets** on the release page and choose the file for your computer. The installer includes the app, its runtime and its PDF exporter.
+**[Download Argus Pip for Mac or Windows](https://github.com/pond1982/creator-dashboard-desktop/releases/latest)**. Open **Assets** on the release page and choose the file for your computer. The installer includes the app, its runtime and its PDF exporter.
 
 | Your computer | Choose | Install |
 | --- | --- | --- |
-| Mac with an Apple M-series chip | `mac-arm64.dmg` | Open the disk image, drag **Creator Dashboard** to **Applications**, then open it from Applications. |
+| Mac with an Apple M-series chip | `mac-arm64.dmg` | Open the disk image, drag **Argus Pip** to **Applications**, then open it from Applications. |
 | Mac with an Intel processor | `mac-x64.dmg` | Follow the same steps using the Intel disk image. |
-| Windows 10 or 11, 64-bit Intel or AMD | `win-x64.exe` | Double-click the installer, then open **Creator Dashboard** from the Start menu. |
+| Windows 10 or 11, 64-bit Intel or AMD | `win-x64.exe` | Double-click the installer, then open **Argus Pip** from the Start menu. |
 
 On a Mac, choose **Apple menu → About This Mac**. **Chip** followed by Apple M1, M2 or later means Apple silicon. **Processor** followed by Intel means Intel. The Mac app requires macOS 13 Ventura or later. [Electron platform support](https://www.electronjs.org/docs/latest/breaking-changes#removed-macos-12-support)
 
@@ -34,11 +34,15 @@ On a Mac, choose **Apple menu → About This Mac**. **Chip** followed by Apple M
 
 **Settings** controls the theme, sources and visible channel tabs. Disabling a source pauses its scheduled updates and retains the connection. Hiding a channel only hides its tab. To change the channel list itself, open **Connections → YouTube**. Leave the key field blank to reuse the saved key.
 
-**Background updates.** Closing the window keeps the app in the Mac menu bar or Windows notification area. Use its chart icon to reopen it, enable **Launch at login**, or select **Quit Creator Dashboard**. While the app is running and online, public YouTube counts refresh every 30 minutes and private Studio reports refresh every six hours. Apple generally releases the previous day’s sales by 8 a.m. Pacific. A first 90-day comparison may fetch up to 180 daily reports. The app caches them and identifies missing dates. [Apple reporting schedule](https://developer.apple.com/help/app-store-connect/reference/reporting/sales-and-trends-reports-availability/)
+**Background updates.** Closing the window keeps the app in the Mac menu bar or Windows notification area. Use its app icon to reopen it, enable **Launch at login**, or select **Quit Argus Pip**. While the app is running and online, public YouTube counts refresh every 30 minutes and private Studio reports refresh every six hours. Apple generally releases the previous day’s sales by 8 a.m. Pacific. A first 90-day comparison may fetch up to 180 daily reports. The app caches them and identifies missing dates. [Apple reporting schedule](https://developer.apple.com/help/app-store-connect/reference/reporting/sales-and-trends-reports-availability/)
 
 ## Privacy and local storage
 
 The desktop window talks to a local service accessible with a per-launch session key. Your computer requests reports directly from Google and Apple. Credentials are encrypted using macOS Keychain-backed storage or Windows user-account encryption (DPAPI). Report snapshots and preferences are ordinary files in your user profile. [Data locations, revocation and reset](docs/credentials.md#pause-updates-revoke-access-or-remove-local-data)
+
+### Upgrading from Creator Dashboard 1.0
+
+If **Launch at login** is enabled, turn it off in the old app’s menu. Quit **Creator Dashboard** from its menu bar or notification area icon, install **Argus Pip**, then open it from Applications or Start. Argus Pip uses the same desktop data folder. To launch the renamed app automatically, turn on **Launch at login** in Argus Pip.
 
 ### Moving from the original Mac browser dashboard
 
