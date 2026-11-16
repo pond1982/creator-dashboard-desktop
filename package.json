@@ -1,6 +1,6 @@
 {
   "name": "creator-dashboard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "A local desktop dashboard for YouTube channels and App Store Connect sales on Mac and Windows.",
   "license": "MIT",

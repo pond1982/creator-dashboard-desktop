@@ -70,7 +70,9 @@ jobs:
           ditto "$mount/Creator Dashboard.app" "$installed"
           codesign --verify --deep --strict "$installed"
           exe="$installed/Contents/MacOS/Creator Dashboard"
-          lipo -verify_arch "$ARCH" "$exe"
+          macho_arch="$ARCH"
+          if [[ "$ARCH" == x64 ]]; then macho_arch=x86_64; fi
+          lipo "$exe" -verify_arch "$macho_arch"
           # Exercise Electron safeStorage in a new unlocked Keychain on this ephemeral runner.
           keychain="$RUNNER_TEMP/creator-smoke.keychain-db"
           password=$(openssl rand -hex 32)

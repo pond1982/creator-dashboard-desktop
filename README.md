@@ -42,7 +42,7 @@ The desktop window talks to a local service accessible with a per-launch session
 
 ### Moving from the original Mac browser dashboard
 
-If the app finds an earlier Mac setup on its first launch, it offers an import. Stop the original service first by running `npm stop` in its project folder, then open the desktop app and select **Import setup**. This copies saved connections, reports and preferences into the desktop app’s own folder. Keep the original service stopped while using the imported connections. Choose **Start fresh** for a separate setup.
+If the app finds an earlier Mac setup on its first launch, it offers an import. Double-click **Stop Dashboard.command** in the project folder, or run `npm stop` there if you have an earlier copy. Then open the desktop app and select **Import setup**. This copies saved connections, reports and preferences into the desktop app’s own folder. Keep the original service stopped while using the imported connections. Choose **Start fresh** for a separate setup.
 
 ## Run from source
 

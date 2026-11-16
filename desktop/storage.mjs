@@ -68,7 +68,7 @@ export async function offerMacImport({ dir, legacyDir, legacyGet, encryption, di
   if (await legacyRunning()) {
     const { response } = await dialog.showMessageBox({
       type: 'info', title: 'Previous dashboard is running', message: 'Your previous Mac dashboard is still running.',
-      detail: 'To import its connections, quit this app, run npm stop in the previous project, then reopen Creator Dashboard. Starting fresh gives this desktop app a separate setup.',
+      detail: 'To import its connections, quit this app, double-click Stop Dashboard.command in the project folder (or run npm stop there), then reopen Creator Dashboard. Starting fresh gives this desktop app a separate setup.',
       buttons: ['Quit to import later', 'Start fresh'], defaultId: 0, cancelId: 0,
     });
     return response === 1;
