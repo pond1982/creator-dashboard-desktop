@@ -68,11 +68,19 @@ jobs:
           hdiutil attach -readonly -nobrowse -mountpoint "$mount" "dist/Argus-Pip-$VERSION-mac-$ARCH.dmg"
           trap 'hdiutil detach "$mount" || true' EXIT
           ditto "$mount/Argus Pip.app" "$installed"
-          codesign --verify --deep --strict "$installed"
           exe="$installed/Contents/MacOS/Argus Pip"
           macho_arch="$ARCH"
           if [[ "$ARCH" == x64 ]]; then macho_arch=x86_64; fi
           lipo "$exe" -verify_arch "$macho_arch"
+          node mac-widget/verify-install.mjs "$installed" "$macho_arch"
+          # Launch Services registers the containing app and discovers the embedded widget.
+          /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$installed"
+          for ((attempt=0; attempt<15; attempt++)); do
+            pluginkit -m -A -D -v -i dev.creatordashboard.desktop.Widget > "$RUNNER_TEMP/widget-plugins.txt" || true
+            if grep -Fq "$installed/Contents/PlugIns/ArgusPipWidget.appex" "$RUNNER_TEMP/widget-plugins.txt"; then break; fi
+            sleep 1
+          done
+          grep -Fq "$installed/Contents/PlugIns/ArgusPipWidget.appex" "$RUNNER_TEMP/widget-plugins.txt"
           # Exercise Electron safeStorage in a new unlocked Keychain on this ephemeral runner.
           keychain="$RUNNER_TEMP/creator-smoke.keychain-db"
           password=$(openssl rand -hex 32)
@@ -113,11 +121,20 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           pattern: installer-*
           path: installers
           merge-multiple: true
+      - name: Package the published artwork
+        shell: bash
+        run: |
+          git archive --format=zip --prefix=Argus-Pip-Artwork/ --output=installers/Argus-Pip-Artwork.zip HEAD -- \
+            LICENSE assets build/icon.png build/icon.icns build/icon.ico public/argus-pip*.png docs/images
+          unzip -tq installers/Argus-Pip-Artwork.zip
       - name: Compute SHA-256 checksums and publish
         shell: bash
         working-directory: installers
@@ -132,6 +149,7 @@ jobs:
             "Argus-Pip-$version-mac-arm64.dmg"
             "Argus-Pip-$version-mac-x64.dmg"
             "Argus-Pip-$version-win-x64.exe"
+            "Argus-Pip-Artwork.zip"
           )
           sha256sum "${files[@]}" > SHA256SUMS.txt
           sha256sum --check SHA256SUMS.txt
@@ -139,6 +157,12 @@ jobs:
           notes="$RUNNER_TEMP/release-notes.md"
           cat > "$notes" <<'NOTES'
           **Mac** — Choose the arm64 disk image for an Apple M-series chip or x64 for an Intel chip. Open the DMG, drag Argus Pip to Applications, then launch it. Find your chip under Apple menu → About This Mac.
+
+          **Mac widgets** — After launching Argus Pip, open **Edit Widgets** and search for **Argus Pip**. Add subscribers, latest upload, or App Store sales in small, medium or large. On macOS Sonoma or later, you can place widgets on the desktop and edit each YouTube widget to choose its channel.
+
+          Subscribers and sales include daily graphs where reports are available. Latest Upload shows published video counts and compares recent uploads in the large size. Each widget opens its own dashboard section.
+
+          **Artwork** — Download Argus-Pip-Artwork.zip for the original mascot, alternative concepts, native icons, menu-bar variants and screenshot previews.
 
           **Windows** — Download the x64 EXE, run it, then open Argus Pip from Start.
 

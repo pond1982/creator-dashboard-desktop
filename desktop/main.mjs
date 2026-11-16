@@ -4,6 +4,7 @@ import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
 import { createDashboard } from '../dashboard.mjs';
 import { createAnalytics } from '../analytics.mjs';
@@ -13,6 +14,8 @@ import { reportDocument } from '../reports.mjs';
 import { makeServer } from '../server.mjs';
 import { openSettings } from '../settings.mjs';
 import { createVault, offerMacImport } from './storage.mjs';
+import { widgetPublisher, widgetSnapshot } from './widget-snapshot.mjs';
+import { widgetRoute } from './widget-link.mjs';
 
 const brand = 'Argus Pip';
 const smoke = process.argv.includes('--smoke-test');
@@ -28,10 +31,25 @@ app.enableSandbox();
 const dir = path.join(profile, 'dashboard');
 const sessionToken = randomBytes(32).toString('base64url');
 let window, tray, server, timer, quitting = false, origin;
+let requestedFromWidget = false;
+let pendingWidgetRoute = null;
+let dashboardLoaded = false;
+
+function openWidgetRoute() {
+  if (!dashboardLoaded || pendingWidgetRoute === null || !window || window.isDestroyed()) return;
+  const hash = pendingWidgetRoute;
+  pendingWidgetRoute = null;
+  if (hash && new URL(window.webContents.getURL()).hash !== hash) {
+    window.loadURL(origin + '/' + hash).catch(() => {});
+  }
+  show();
+}
 const securePreferences = { sandbox: true, contextIsolation: true, nodeIntegration: false, webviewTag: false, devTools: false };
 const externalHosts = new Set(['accounts.google.com', 'console.cloud.google.com', 'myaccount.google.com',
   'developers.google.com', 'support.google.com', 'docs.cloud.google.com', 'appstoreconnect.apple.com', 'developer.apple.com',
-  'github.com', 'support.apple.com', 'www.youtube.com', 'studio.youtube.com']);
+  'github.com', 'support.apple.com', 'www.youtube.com', 'studio.youtube.com',
+  'pond1982.github.io', 'breakfinderweb.pages.dev', 'easy-tracer-web.pages.dev', 'privacylensweb.pages.dev',
+  'pulse-web-5vx.pages.dev', 'puttandpayweb.pages.dev']);
 
 async function openExternal(value) {
   const url = new URL(value);
@@ -102,6 +120,14 @@ function installMenus() {
   const loginArgs = process.platform === 'win32' ? { args: ['--background'] } : {};
   const operations = () => [
     { label: 'Open ' + brand, click: show },
+    ...(process.platform === 'darwin' && app.isPackaged ? [{
+      label: 'Mac widget setup…',
+      click: () => dialog.showMessageBox({
+        type: 'info', title: 'Argus Pip widget', message: 'Add Argus Pip to your Mac',
+        detail: 'Control-click your desktop and choose Edit Widgets, or open Notification Center and choose Edit Widgets. Search for Argus Pip. Choose Subscribers, Latest Upload or App Store Sales, pick a size, then click the preview. Control-click a widget to resize it. On macOS 14 or later, choose Edit Widget on a YouTube widget to pick its channel.',
+        buttons: ['Done'],
+      }),
+    }] : []),
     { label: 'Launch at login', type: 'checkbox', enabled: app.isPackaged,
       checked: app.isPackaged && app.getLoginItemSettings(loginArgs).openAtLogin,
       click: item => {
@@ -165,10 +191,23 @@ async function openDashboard() {
   window.on('close', event => { if (!quitting) { event.preventDefault(); window.hide(); } });
   window.on('session-end', () => { quitting = true; });
   await window.loadURL(origin + '/');
+  dashboardLoaded = true;
+  openWidgetRoute();
 }
 
 async function smokeTest() {
   trayIcon(); // Verify that the packaged tray artwork can be decoded.
+  if (process.platform === 'darwin') {
+    const snapshot = JSON.parse(await readFile(path.join(profile, 'widget-snapshot.json'), 'utf8'));
+    if (snapshot.version !== 1 || snapshot.sales !== null || snapshot.channels.length !== 0) {
+      throw new Error('Widget snapshot initialization failed.');
+    }
+    if (app.isPackaged) {
+      const bridge = createRequire(import.meta.url)(path.join(process.resourcesPath, 'argus-widget-bridge.node'));
+      if (typeof bridge.reload !== 'function') throw new Error('The native widget bridge is unavailable.');
+      // Verify the module without disturbing the real user's widget timeline.
+    }
+  }
   // Windows DPAPI is noninteractive. On a developer's Mac, use an ephemeral
   // cipher unless they explicitly select the native Keychain smoke check.
   let cipher = safeStorage;
@@ -235,7 +274,45 @@ async function start() {
   const dashboard = await createDashboard({ dir, vault });
   const analytics = await createAnalytics({ dir, vault, redirectUri: () => origin });
   const settings = await openSettings(dir, dashboard.state());
-  server = await makeServer(dashboard, 0, analytics, settings, { sessionToken, getOrigin: () => origin, renderPdf, openExternal });
+  let publishWidget = async () => {};
+  let publicDashboard = dashboard, publicAnalytics = analytics, publicSettings = settings;
+  if (process.platform === 'darwin') {
+    let reload;
+    if (app.isPackaged && !smoke) {
+      try {
+        const bridge = createRequire(import.meta.url)(path.join(process.resourcesPath, 'argus-widget-bridge.node'));
+        reload = () => bridge.reload();
+      } catch { /* WidgetKit's own timeline also reads the snapshot. */ }
+    }
+    const publish = widgetPublisher({
+      file: path.join(profile, 'widget-snapshot.json'), reload,
+      readSnapshot: () => {
+        const preferences = settings.get();
+        const state = dashboard.state({ includeDailySales: preferences.onboarded && preferences.sources.includes('apple') });
+        const ids = preferences.sources.includes('youtube')
+          ? (state.youtube.data ?? []).map(channel => channel.id).filter(id => preferences.visibleChannelIds?.includes(id) ?? true) : [];
+        return widgetSnapshot(state, preferences, analytics.state(ids));
+      },
+    });
+    publishWidget = () => publish().catch(() => { console.error('Could not update the local widget snapshot.'); });
+    // Publish on the same operations as the dashboard, including an OAuth
+    // callback and a preference change. No separate polling job is needed.
+    const afterChanges = (source, methods) => {
+      const wrapped = { ...source };
+      for (const method of methods) {
+        wrapped[method] = async (...args) => {
+          try { return await source[method](...args); }
+          finally { await publishWidget(); }
+        };
+      }
+      return wrapped;
+    };
+    publicDashboard = afterChanges(dashboard, ['sync']);
+    publicAnalytics = afterChanges(analytics, ['callback', 'refresh']);
+    publicSettings = afterChanges(settings, ['save']);
+    await publishWidget();
+  }
+  server = await makeServer(publicDashboard, 0, publicAnalytics, publicSettings, { sessionToken, getOrigin: () => origin, renderPdf, openExternal });
   await new Promise((resolve, reject) => {
     server.once('error', reject);
     server.listen(0, '127.0.0.1', resolve);
@@ -245,7 +322,7 @@ async function start() {
   await openDashboard();
   if (smoke) { await smokeTest(); window.destroy(); server.close(); app.quit(); return; }
   const startedAtLogin = app.isPackaged && app.getLoginItemSettings().wasOpenedAtLogin;
-  if (!process.argv.includes('--background') && !startedAtLogin) show();
+  if (requestedFromWidget || (!process.argv.includes('--background') && !startedAtLogin)) show();
   let updating = false;
   async function tick() {
     if (updating) return;
@@ -255,7 +332,7 @@ async function start() {
       const ids = settings.get().sources.includes('youtube') ? (dashboard.state().youtube.data ?? []).map(c => c.id) : [];
       await analytics.tick(ids);
     } catch { /* Per-source state retains actionable errors; the next tick retries. */ }
-    finally { updating = false; }
+    finally { await publishWidget(); updating = false; }
   }
   tick();
   timer = setInterval(tick, 60000);
@@ -263,6 +340,14 @@ async function start() {
 
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
+  app.on('open-url', (event, url) => {
+    const route = widgetRoute(url);
+    if (route === null) return;
+    event.preventDefault();
+    requestedFromWidget = true;
+    pendingWidgetRoute = route;
+    openWidgetRoute();
+  });
   app.on('second-instance', show);
   app.on('activate', show);
   app.on('window-all-closed', () => {});

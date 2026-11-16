@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { getChannels } from './youtube.mjs';
-import { getSales, latestAppleReportDate, validateApplePeriod } from './apple.mjs';
+import { dailyPaidDownloads, getSales, latestAppleReportDate, validateApplePeriod } from './apple.mjs';
 import { keychain } from './keychain.mjs';
 import { support } from './paths.mjs';
 
@@ -49,11 +49,15 @@ export async function createDashboard({ dir = support, vault = keychain, youtube
     records[source] = record;
   }
 
-  function state() {
+  function state({ includeDailySales = false } = {}) {
     const result = { busy: { ...busy } };
     for (const source of sources) {
       const { account, data, updatedAt, error, meta } = records[source];
       result[source] = { configured: Boolean(account), data, updatedAt, error, ...meta };
+    }
+    if (includeDailySales) {
+      const record = records.apple;
+      result.apple.dailyPaidDownloads = record.dailyPaidDownloads ?? dailyPaidDownloads(record.data, record.cache);
     }
     return result;
   }
@@ -87,7 +91,10 @@ export async function createDashboard({ dir = support, vault = keychain, youtube
       if (!previous.account) throw new Error('Connect App Store Connect first.');
       const config = await savedCredentials(previous);
       const { cache, ...report } = await apple(config, previous.cache, { now: now(), days });
-      await save('apple', { ...previous, cache });
+      // This request changes the reusable cache but preserves the default
+      // report. Keep its chart on the same revision as its headline totals.
+      await save('apple', { ...previous, cache,
+        dailyPaidDownloads: previous.dailyPaidDownloads ?? dailyPaidDownloads(previous.data, previous.cache) });
       return report;
     });
   }
@@ -133,6 +140,7 @@ export async function createDashboard({ dir = support, vault = keychain, youtube
       }
       const record = { data, cache, meta, updatedAt: now().toISOString(), lastAttemptAt: attempt, error: null, account: previous.account };
       if (source === 'youtube') record.channelIds = data.map(channel => channel.id);
+      else record.dailyPaidDownloads = dailyPaidDownloads(data, cache);
       if (setup) {
         record.account = `${source}-${randomUUID()}`;
         // Channel labels and immutable IDs live in the source record. This keeps the

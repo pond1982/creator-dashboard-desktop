@@ -1,0 +1,98 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		44B72E2D00C74F6AA34F070D /* ChannelSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8019C0EE23464BE8B81EE5A1; };
+		8E481BBECECC47C299F7A25C /* ArgusPipWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9130F4CDDF2E4716943E4078; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		8019C0EE23464BE8B81EE5A1 /* ChannelSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelSelection.swift; sourceTree = "<group>"; };
+		9130F4CDDF2E4716943E4078 /* ArgusPipWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArgusPipWidget.swift; sourceTree = "<group>"; };
+		D812814876B84F77BB8C4BD4 /* ArgusPipWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; path = ArgusPipWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		05355C2759BF41BA8D886DE7 = {isa = PBXGroup; children = (9130F4CDDF2E4716943E4078, 8019C0EE23464BE8B81EE5A1, 118A7A77138D40C9865BE342); sourceTree = "<group>"; };
+		118A7A77138D40C9865BE342 /* Products */ = {isa = PBXGroup; children = (D812814876B84F77BB8C4BD4); name = Products; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3D44DF5864C64514A36B4678 /* ArgusPipWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7C2802C6AF9A4A29A4CA20FE;
+			buildPhases = (33750591385F498A9DCC02FA);
+			buildRules = ();
+			dependencies = ();
+			name = ArgusPipWidget;
+			productName = ArgusPipWidget;
+			productReference = D812814876B84F77BB8C4BD4;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		90AB6B1269A842E38F2E801A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {LastUpgradeCheck = 1600; };
+			buildConfigurationList = 0636B803E63F4E9DA2E8A324;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base);
+			mainGroup = 05355C2759BF41BA8D886DE7;
+			productRefGroup = 118A7A77138D40C9865BE342;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (3D44DF5864C64514A36B4678);
+		};
+/* End PBXProject section */
+
+
+/* Begin PBXSourcesBuildPhase section */
+		33750591385F498A9DCC02FA /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (8E481BBECECC47C299F7A25C, 44B72E2D00C74F6AA34F070D); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D4BA12D435864BDEA738C956 /* Project Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		9701E9BF4E974E8F9C14107C /* Target Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = widget.entitlements;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@executable_path/../../../../Frameworks");
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.creatordashboard.desktop.Widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7C2802C6AF9A4A29A4CA20FE /* Build configuration list for target */ = {isa = XCConfigurationList; buildConfigurations = (9701E9BF4E974E8F9C14107C); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		0636B803E63F4E9DA2E8A324 /* Build configuration list for project */ = {isa = XCConfigurationList; buildConfigurations = (D4BA12D435864BDEA738C956); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = 90AB6B1269A842E38F2E801A;
+}

@@ -14,6 +14,26 @@ function shiftDay(day, offset) {
   return date.toISOString().slice(0, 10);
 }
 
+// Read the already-cached reports for the displayed week, including refunds.
+// An absent report is a gap even when another date in the week had no sales.
+export function dailyPaidDownloads(report, cache) {
+  const daily = [];
+  if (!report || ![report.from, report.through].every(day => /^\d{4}-\d{2}-\d{2}$/.test(day) && Number.isFinite(Date.parse(day)))) return daily;
+  const missing = new Set(report.missingDays ?? []);
+  for (let offset = -6; offset <= 0; offset++) {
+    const date = shiftDay(report.through, offset);
+    if (date < report.from) continue;
+    const day = cache?.version === 1 && !missing.has(date) ? cache.reports?.[date] : null;
+    let paidDownloads = null;
+    if (day?.noSales) paidDownloads = 0;
+    else if (Array.isArray(day?.apps) && day.apps.every(app => Number.isSafeInteger(app?.paidDownloads))) {
+      paidDownloads = day.apps.reduce((total, app) => total + app.paidDownloads, 0);
+    }
+    daily.push({ date, paidDownloads });
+  }
+  return daily;
+}
+
 export function latestAppleReportDate(now) {
   const parts = Object.fromEntries(pacificTime.formatToParts(now).map(p => [p.type, p.value]));
   const today = [parts.year, parts.month, parts.day].join('-');

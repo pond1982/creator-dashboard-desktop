@@ -4,6 +4,7 @@ directories:
   output: dist
   buildResources: build
 asar: true
+afterPack: ./mac-widget/build.cjs
 files:
   - desktop/**/*
   - analytics.mjs
@@ -24,6 +25,11 @@ mac:
   # Ad-hoc signatures allow native launch on Apple Silicon; no Developer ID is bundled.
   identity: "-"
   notarize: false
+  signIgnore:
+    - '/Contents/PlugIns/ArgusPipWidget\.appex(?:/|$)'
+  protocols:
+    - name: Open Argus Pip
+      schemes: [arguspip]
   artifactName: 'Argus-Pip-${version}-mac-${arch}.${ext}'
 win:
   target: nsis
