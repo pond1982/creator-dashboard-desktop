@@ -2,6 +2,8 @@
 
 A local dashboard for YouTube Studio and App Store Connect on Mac and Windows, with channel and sales widgets for macOS. Open it to see how your latest video is doing, compare app sales with the previous period, or save a PDF report. Your connections and reports stay on your computer.
 
+[Explore the features and try the sample dashboard](https://pond1982.github.io/creator-dashboard-desktop/)
+
 ## Download and install
 
 **[Download Argus Pip for Mac or Windows](https://github.com/pond1982/creator-dashboard-desktop/releases/latest)**. Open **Assets** on the release page and choose the file for your computer. The installer includes the app, its runtime and its PDF exporter.

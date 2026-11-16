@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101019">
+  <title>Argus Pip — YouTube and App Store analytics for your desktop</title>
+  <meta name="description" content="Follow your YouTube channels and App Store sales in one local dashboard for Mac and Windows. Explore a sample dashboard, native Mac widgets and PDF reports.">
+  <link rel="canonical" href="https://pond1982.github.io/creator-dashboard-desktop/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Argus Pip">
+  <meta property="og:title" content="Argus Pip — Your channels and app sales in one place">
+  <meta property="og:description" content="A local creator dashboard for Mac and Windows, with private Studio reports, app sales comparisons and native Mac widgets.">
+  <meta property="og:url" content="https://pond1982.github.io/creator-dashboard-desktop/">
+  <meta property="og:image" content="https://pond1982.github.io/creator-dashboard-desktop/assets/social.png">
+  <meta property="og:image:alt" content="Argus Pip, the purple three-eyed guardian for a creator’s desktop">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/png" href="assets/icon.png">
+  <link rel="preload" href="assets/dm-sans.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="site.css">
+  <script type="module" src="demo.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <div class="site-wrap nav-bar">
+      <a class="brand" href="#top"><img src="assets/icon.png" alt="" width="34" height="34">Argus Pip</a>
+      <nav class="page-links" aria-label="Main navigation">
+        <a href="#demo">Demo</a><a href="#widgets">Widgets</a><a href="#setup">Setup</a>
+      </nav>
+      <a class="nav-release" href="https://github.com/pond1982/creator-dashboard-desktop/releases/latest">Downloads <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-haze" aria-hidden="true"></div>
+      <div class="site-wrap hero-inner">
+        <div class="hero-copy">
+          <p class="source-line"><span class="live-light" aria-hidden="true"></span>YouTube Studio <span class="plus" aria-hidden="true">+</span> App Store Connect</p>
+          <h1 id="hero-title">Your channels<br>and app sales<br><em>in one place.</em></h1>
+          <p class="hero-description">Check how your latest upload is doing and which apps are selling. Argus Pip puts your YouTube and App Store reports on your desktop.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="https://github.com/pond1982/creator-dashboard-desktop/releases/latest"><span class="download-icon" aria-hidden="true">↓</span> Download Argus Pip</a>
+            <a class="button secondary" href="#demo">Try the demo <span aria-hidden="true">↘</span></a>
+          </div>
+          <p class="hero-platforms">Free and open source <span aria-hidden="true">·</span> macOS &amp; Windows</p>
+        </div>
+        <div class="hero-art">
+          <div class="orbital-scene" aria-hidden="true">
+            <div class="orbital-halo"></div>
+            <div class="orbit orbit-outer"><i></i></div>
+            <div class="orbit orbit-mid"><i></i></div>
+            <div class="orbit orbit-cross"></div>
+            <i class="star star-one">✦</i><i class="star star-two">✦</i><i class="star star-three">✦</i>
+          </div>
+          <div class="mascot-bearing"><img class="hero-mascot" src="assets/mascot.webp" width="800" height="800" alt="Argus Pip, a purple guardian with a third green eye" fetchpriority="high"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="site-wrap demo-section" id="demo" aria-labelledby="demo-title">
+      <div class="section-intro">
+        <div><p class="section-kicker"><span></span>Interactive demo</p><h2 id="demo-title">Explore the dashboard.</h2></div>
+        <p>Choose a sample channel, inspect its daily views, or switch to the App Store to compare sales.</p>
+      </div>
+      <argus-demo></argus-demo>
+      <noscript><p class="no-demo">Turn on JavaScript to try the sample dashboard. The feature guide and downloads below are available anytime.</p></noscript>
+      <div class="source-features">
+        <article class="source-feature youtube-feature">
+          <span class="source-symbol video-symbol" aria-hidden="true"></span>
+          <div><h3>Your channels, up close</h3><p>See subscribers and lifetime views for each channel. Sort up to 25 recent uploads by views, likes or comments. Connect private Studio analytics for watch time, subscriber changes, traffic sources and viewer countries.</p></div>
+        </article>
+        <article class="source-feature store-feature">
+          <span class="source-symbol store-symbol" aria-hidden="true"></span>
+          <div><h3>Know which apps are selling</h3><p>Rank paid downloads, free downloads, in-app purchases or estimated proceeds. Compare 1, 7, 30 or 90 reporting days with the previous period, and choose the currency you want to see.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="widget-band" id="widgets" aria-labelledby="widgets-title">
+      <div class="site-wrap">
+        <div class="section-intro">
+          <div><p class="section-kicker"><span></span>Native Mac widgets</p><h2 id="widgets-title">Keep your numbers in view.</h2></div>
+          <p>Add a widget for the number you check most. Pin several for different channels, or click one to open its place in the app.</p>
+        </div>
+        <div class="widget-grid">
+          <figure><img loading="lazy" src="assets/widget-subscribers.webp" width="658" height="658" alt="Sample widget showing subscriber counts by channel and daily net subscriber changes"><figcaption><span class="widget-dot mint"></span>YouTube Subscribers</figcaption></figure>
+          <figure><img loading="lazy" src="assets/widget-latest.webp" width="658" height="658" alt="Sample widget showing the latest upload, its views, likes, comments and recent video comparisons"><figcaption><span class="widget-dot purple"></span>YouTube Latest Upload</figcaption></figure>
+          <figure><img loading="lazy" src="assets/widget-sales.webp" width="658" height="658" alt="Sample widget showing daily paid downloads, top app, free downloads, in-app purchases and estimated proceeds"><figcaption><span class="widget-dot amber"></span>App Store Sales</figcaption></figure>
+        </div>
+        <p class="widget-footnote">Small, medium or large. Add them in Notification Center on macOS 13, or on your desktop with per-widget channel selection on macOS 14 and later.</p>
+      </div>
+    </section>
+
+    <section class="site-wrap desktop-section" aria-labelledby="desktop-title">
+      <div class="section-intro"><div><p class="section-kicker"><span></span>On your computer</p><h2 id="desktop-title">Built for your daily check-in.</h2></div></div>
+      <div class="daily-features">
+        <article><div class="feature-icon" aria-hidden="true">↻</div><h3>Updates in the background</h3><p>Keep the app in the Mac menu bar or Windows tray. While online, it checks public YouTube data every 30 minutes and private Studio reports every six hours.</p></article>
+        <article><div class="feature-icon pdf-icon" aria-hidden="true">PDF</div><h3>Save a report to share</h3><p>Export a PDF for one channel or your selected sales period and currency. Keep a copy of this month’s numbers or send a snapshot to a collaborator.</p></article>
+        <article><div class="feature-icon lock-icon" aria-hidden="true"><i></i></div><h3>Keep your data local</h3><p>Your computer fetches reports directly from Google and Apple. Your operating system protects saved credentials, and reports stay in your user profile.</p></article>
+      </div>
+    </section>
+
+    <section class="site-wrap setup-section" id="setup" aria-labelledby="setup-title">
+      <div class="setup-panel">
+        <div class="setup-intro">
+          <p class="section-kicker"><span></span>Mac &amp; Windows</p>
+          <h2 id="setup-title">Set up your own dashboard.</h2>
+          <p>Choose YouTube, App Store Connect, or both. Add the channels you follow and choose Midnight, Aurora or Daylight for your desktop.</p>
+          <a class="button primary" href="https://github.com/pond1982/creator-dashboard-desktop/releases/latest">View GitHub downloads <span aria-hidden="true">↗</span></a>
+          <a class="text-link" href="https://github.com/pond1982/creator-dashboard-desktop/blob/main/docs/credentials.md">Step-by-step connection guide <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="install-guides">
+          <h3>Choose your installer</h3>
+          <details open><summary>macOS <small>13 Ventura or later</small></summary><div><p>In the release assets, choose the <code>mac-arm64.dmg</code> for an Apple M-series chip or <code>mac-x64.dmg</code> for an Intel Mac. Open it, drag Argus Pip to Applications, and launch it there.</p></div></details>
+          <details><summary>Windows <small>10 or 11 · x64</small></summary><div><p>Choose the <code>win-x64.exe</code> release asset for a 64-bit Intel or AMD computer. Run the installer, then open Argus Pip from the Start menu.</p></div></details>
+          <details><summary>Connect your accounts</summary><div><p>Add a Google API key for public channel stats. Authorize each channel in your browser for private Studio reports. Apple sales use your team’s reporting key and vendor number.</p><a class="text-link" href="https://github.com/pond1982/creator-dashboard-desktop/blob/main/docs/credentials.md">Follow the credential guide ↗</a></div></details>
+          <a class="install-notes" href="https://github.com/pond1982/creator-dashboard-desktop#download-and-install">First-launch instructions and release checksums <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="site-wrap">
+      <div class="footer-intro">
+        <div><a class="brand" href="#top"><img loading="lazy" src="assets/icon.png" alt="" width="34" height="34">Argus Pip</a><p>Made by <a href="https://pond1982.github.io/Pondd-Page/">Pondd</a>.</p></div>
+        <nav class="footer-product" aria-label="Product resources"><a href="https://github.com/pond1982/creator-dashboard-desktop">Source on GitHub ↗</a><a href="https://github.com/pond1982/creator-dashboard-desktop/releases">All releases ↗</a><a href="https://github.com/pond1982/creator-dashboard-desktop/releases/latest/download/Argus-Pip-Artwork.zip">Artwork pack ↓</a></nav>
+      </div>
+      <details class="project-directory">
+        <summary><span>More from Pondd</span><small>Apps, games &amp; creative projects</small></summary>
+        <nav aria-label="Pondd’s project collection" class="project-links">
+          <a href="https://pond1982.github.io/Pondd-Page/">Pondd · Portfolio</a>
+          <a href="https://pond1982.github.io/screenshot-studio/">Screenshot Studio</a>
+          <a href="https://pond1982.github.io/pet-28-days/">Pet 28 Days · ข้าวตัง &amp; ส้มโอ</a>
+          <a href="https://pond1982.github.io/bangkok-sky-zero/">Bangkok Sky Zero</a>
+          <a href="https://pond1982.github.io/21Counts-Web/">21Counts</a>
+          <a href="https://breakfinderweb.pages.dev/">BreakFinder</a>
+          <a href="https://pond1982.github.io/BuddhaBits-web/index.html">BuddhaBits</a>
+          <a href="https://pond1982.github.io/iosdeadscriptweb/index.html">Dead Script: Typing Horror</a>
+          <a href="https://easy-tracer-web.pages.dev/">Easy Tracer: Golf Swing Glow</a>
+          <a href="https://pond1982.github.io/ink-and-legend-site/">Ink &amp; Legend</a>
+          <a href="https://pond1982.github.io/ISUD-Website/isud2-support.html">ISUD 2</a>
+          <a href="https://pond1982.github.io/ISUD-Website/">ISUD Zero</a>
+          <a href="https://pond1982.github.io/Landslide-Web/index.html">Landslide Inc</a>
+          <a href="https://pond1982.github.io/Morse-Support-Site/">Morse Code with Flint</a>
+          <a href="https://pond1982.github.io/Oonmoon-Website/en/">Oonmoon: Bedtime Stories</a>
+          <a href="https://pulse-web-5vx.pages.dev/">P.U.L.S.E.</a>
+          <a href="https://pond1982.github.io/StepBlade-Website/index.html">Pip vs 10 Towers</a>
+          <a href="https://privacylensweb.pages.dev/">PrivacyLens</a>
+          <a href="https://puttandpayweb.pages.dev/">PuttAndPay</a>
+          <a href="https://pond1982.github.io/PuttPOV-Website/">PuttPOV</a>
+          <a href="https://pond1982.github.io/ReadSlipWebsite/index.html">อ่านสลิป: จดสลิปโอนเงิน</a>
+          <a href="https://pond1982.github.io/SkyFiWeb/">SkyFiCam</a>
+          <a href="https://pond1982.github.io/stackfighters-site/index.html">Stack Fighters: Puzzle Battle</a>
+          <a href="https://pond1982.github.io/stackcycle---web/">StackCycle</a>
+          <a href="https://pond1982.github.io/TheAiCompanyWeb/">The AI Company</a>
+        </nav>
+      </details>
+      <nav class="channel-links" aria-label="Pondd’s YouTube channels"><span>YouTube channels</span>
+        <a href="https://www.youtube.com/@เรื่องในเงา" lang="th">เรื่องในเงา</a>
+        <a href="https://www.youtube.com/@เล่าเห็นภาพ" lang="th">เล่าเห็นภาพ</a>
+        <a href="https://www.youtube.com/@อดีตถึงวันนี้" lang="th">อดีตถึงวันนี้</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
